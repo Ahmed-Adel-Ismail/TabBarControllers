@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/TabBarController.iml" filepath="$PROJECT_DIR$/TabBarController.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tab-bar-controller/tab-bar-controller.iml" filepath="$PROJECT_DIR$/tab-bar-controller/tab-bar-controller.iml" />
     </modules>
   </component>
 </project>
