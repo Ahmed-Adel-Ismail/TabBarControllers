@@ -4,7 +4,6 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.LayoutRes;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class TabBarBuilder<T> {
 
@@ -41,11 +40,19 @@ public class TabBarBuilder<T> {
     }
 
     public TabBuilder<T> withNextTab() {
-        return withTab(items.keySet().size());
+        return withTab(nextTabIndexOrCrash());
     }
 
     public TabBuilder<T> withTab(@TabIndex int index) {
         return new TabBuilder<>(this, index);
+    }
+
+    private int nextTabIndexOrCrash() {
+        int nextIndex = items.keySet().size();
+        if (nextIndex > TabIndex.MAX_INDEX) {
+            throw new UnsupportedOperationException("max tabs reached");
+        }
+        return nextIndex;
     }
 
     TabBarBuilder<T> buildTab(TabBuilder<T> tabBuilder) {

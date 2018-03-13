@@ -8,4 +8,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.SOURCE)
 @IntDef({0, 1, 2, 3})
 public @interface TabIndex {
+
+    int MAX_INDEX = 3;
 }
