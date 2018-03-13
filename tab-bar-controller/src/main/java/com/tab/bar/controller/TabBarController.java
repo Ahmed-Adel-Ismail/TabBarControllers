@@ -9,7 +9,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
  * a View that handles displaying a Tab-Bar Controller which is similar to IOS
@@ -39,16 +38,17 @@ public class TabBarController extends LinearLayout {
         for (int viewIndex = 0; viewIndex < builder.tabsCount; viewIndex++) {
             drawTabViews(viewIndex, builder);
         }
+        getChildAt(0).performClick();
     }
 
     private void drawTabViews(int viewIndex, TabBarBuilder builder) {
-        View view = inflate(getContext(), builder.tabView, this);
+        View view = inflate(getContext(), builder.tabView, null);
         updateLayoutParams(view);
         resetIndicatorColor(view);
-        updateTabLabel(viewIndex, view, builder);
-        updateTabIcon(viewIndex, view, builder);
-        updateTabOnClick(viewIndex, view, builder);
-        addView(view);
+        updateLabel(viewIndex, view, builder);
+        updateIcon(viewIndex, view, builder);
+        updateOnClick(viewIndex, view, builder);
+        addView(view,viewIndex);
     }
 
     private void updateLayoutParams(View view) {
@@ -63,18 +63,18 @@ public class TabBarController extends LinearLayout {
                 .setBackgroundResource(android.R.color.transparent);
     }
 
-    private void updateTabLabel(int viewIndex, View view, TabBarBuilder builder) {
+    private void updateLabel(int viewIndex, View view, TabBarBuilder builder) {
         TextView label = view.findViewById(R.id.tab_label);
         label.setTextColor(getResources().getColor(builder.labelsColor));
         label.setText((Integer) builder.labels.get(viewIndex));
     }
 
-    private void updateTabIcon(int viewIndex, View view, TabBarBuilder builder) {
+    private void updateIcon(int viewIndex, View view, TabBarBuilder builder) {
         ((ImageView) view.findViewById(R.id.tab_icon))
                 .setImageResource((Integer) builder.icons.get(viewIndex));
     }
 
-    private void updateTabOnClick(final int viewIndex, View view, final TabBarBuilder builder) {
+    private void updateOnClick(final int viewIndex, View view, final TabBarBuilder builder) {
         view.setTag(builder.items.get(viewIndex));
         view.setOnClickListener(new OnClickListener() {
 

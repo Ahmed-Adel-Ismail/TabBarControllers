@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">TabBarController</string>
+    <string name="data_one">Data one</string>
+    <string name="data_two">Data two</string>
+    <string name="data_three">Data three</string>
+    <string name="data_four">Data four</string>
+
 </resources>

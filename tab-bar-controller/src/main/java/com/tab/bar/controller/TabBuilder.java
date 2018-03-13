@@ -23,22 +23,22 @@ public class TabBuilder<T> {
         this.index = index;
     }
 
-    public TabBuilder withIcon(@DrawableRes int icon) {
+    public TabBuilder<T> withIcon(@DrawableRes int icon) {
         this.icon = icon;
         return this;
     }
 
-    public TabBuilder withLabel(@StringRes int label) {
+    public TabBuilder<T> withLabel(@StringRes int label) {
         this.label = label;
         return this;
     }
 
-    public TabBuilder withOnClick(@NonNull OnTabClick<T> onTabClick) {
+    public TabBuilder<T> withOnClick(@NonNull OnTabClick<T> onTabClick) {
         this.onClick = onTabClick;
         return this;
     }
 
-    public TabBuilder withItem(@NonNull T item) {
+    public TabBuilder<T> withItem(@NonNull T item) {
         this.item = item;
         return this;
     }

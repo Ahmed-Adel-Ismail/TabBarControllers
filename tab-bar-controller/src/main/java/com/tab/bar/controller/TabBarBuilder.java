@@ -26,8 +26,8 @@ public class TabBarBuilder<T> {
         this.tabsCount = tabsCount;
     }
 
-    public static <T> TabBarBuilder<T> withTabsCount(@TabsCount int tabsCount) {
-        return new TabBarBuilder<>(tabsCount);
+    public static <T> TabBarFactor<T> withDataSourceType(Class<T> type){
+        return new TabBarFactor<>();
     }
 
     public TabBarBuilder<T> withIndicatorsColor(@ColorRes int indicatorsColor) {
@@ -54,6 +54,18 @@ public class TabBarBuilder<T> {
 
     public void draw(TabBarController tabBarController) {
         tabBarController.build(this);
+    }
+
+    public static class TabBarFactor<T> {
+
+        private TabBarFactor(){
+
+        }
+
+        public TabBarBuilder<T> withTabsCount(@TabsCount int tabsCount) {
+            return new TabBarBuilder<>(tabsCount);
+        }
+
     }
 
 }
