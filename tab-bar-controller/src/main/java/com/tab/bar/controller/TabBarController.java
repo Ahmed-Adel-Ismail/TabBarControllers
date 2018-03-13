@@ -64,7 +64,7 @@ public class TabBarController extends LinearLayout {
     }
 
     private void updateLabel(int viewIndex, View view, TabBarBuilder builder) {
-        TextView label = view.findViewById(R.id.tab_label);
+        TextView label = (TextView) view.findViewById(R.id.tab_label);
         label.setTextColor(getResources().getColor(builder.labelsColor));
         label.setText((Integer) builder.labels.get(viewIndex));
     }
