@@ -1,12 +1,18 @@
 package com.tab.bar.controller;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.ImageViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.LinkedHashMap;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
@@ -16,6 +22,8 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
  * Created by Ahmed Adel Ismail on 3/12/2018.
  */
 public class TabBarController extends LinearLayout {
+
+    private final LinkedHashMap<Integer, Tab> tabs = new LinkedHashMap<>(5, 1f);
 
     {
         inflate(getContext(), R.layout.view_tabs_bar, null);
@@ -43,66 +51,99 @@ public class TabBarController extends LinearLayout {
 
     private void drawTabViews(int viewIndex, TabBarBuilder builder) {
         View view = inflate(getContext(), builder.tabView, null);
-        updateLayoutParams(view);
-        resetIndicatorColor(view);
-        updateLabel(viewIndex, view, builder);
-        updateIcon(viewIndex, view, builder);
-        updateOnClick(viewIndex, view, builder);
-        addView(view,viewIndex);
+        tabs.put(viewIndex, tab(viewIndex, builder, view));
+        addView(view, viewIndex);
     }
 
-    private void updateLayoutParams(View view) {
+    @NonNull
+    private Tab tab(int viewIndex, TabBarBuilder builder, View view) {
+        Tab tab = createTab(viewIndex, builder, viewWithLayoutParams(view));
+        updateToUnselectedState(tab);
+        updateLabel(tab);
+        updateIconResource(tab);
+        updateOnClick(viewIndex, tab);
+        return tab;
+    }
+
+    @NonNull
+    private <T> Tab createTab(int viewIndex, TabBarBuilder<T> builder, View view) {
+        return new Tab.Builder<T>()
+                .tab(view)
+                .indicator(view.findViewById(R.id.tab_indicator))
+                .icon((ImageView) view.findViewById(R.id.tab_icon))
+                .label((TextView) view.findViewById(R.id.tab_label))
+                .tabData(builder.tabsData.get(viewIndex))
+                .build();
+    }
+
+    private View viewWithLayoutParams(View view) {
         LayoutParams params = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
         params.weight = 1;
         view.setLayoutParams(params);
+        return view;
     }
 
 
-    private void resetIndicatorColor(View view) {
-        view.findViewById(R.id.tab_indicator)
-                .setBackgroundResource(android.R.color.transparent);
+    private void updateToUnselectedState(Tab tab) {
+        switchTab(tab, android.R.color.transparent, tab.data.unselectedColor, false);
     }
 
-    private void updateLabel(int viewIndex, View view, TabBarBuilder builder) {
-        TextView label = (TextView) view.findViewById(R.id.tab_label);
-        label.setTextColor(getResources().getColor(builder.labelsColor));
-        label.setText((Integer) builder.labels.get(viewIndex));
+    private void switchTab(Tab tab, int indicator, int tint, boolean selected) {
+        tab.indicator.setBackgroundResource(indicator);
+        tab.label.setTextColor(getResources().getColor(tint));
+        updateIconTint(tab.icon, tint);
+        tab.view.setSelected(selected);
     }
 
-    private void updateIcon(int viewIndex, View view, TabBarBuilder builder) {
-        ((ImageView) view.findViewById(R.id.tab_icon))
-                .setImageResource((Integer) builder.icons.get(viewIndex));
+    private void updateIconTint(ImageView imageView, int colorResource) {
+        ImageViewCompat.setImageTintList(imageView,
+                ColorStateList.valueOf(colorValue(colorResource)));
     }
 
-    private void updateOnClick(final int viewIndex, View view, final TabBarBuilder builder) {
-        view.setTag(builder.items.get(viewIndex));
-        view.setOnClickListener(new OnClickListener() {
+    private void updateLabel(Tab tab) {
+        tab.label.setText(tab.data.labelResource);
+    }
+
+    private void updateIconResource(Tab tab) {
+        tab.icon.setImageResource(tab.data.iconResource);
+    }
+
+    private void updateOnClick(final int viewIndex, Tab tab) {
+        tab.view.setTag(tab);
+        tab.view.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                unselectOtherTabs();
-                selectCurrentTab(v, builder);
-                invokeOnTabClick(v, builder, viewIndex);
+                Tab tab = (Tab) v.getTag();
+                unselectAllTabs();
+                selectTab(tab);
+                invokeOnTabClick(viewIndex, tab);
             }
         });
     }
 
-    private void unselectOtherTabs() {
+
+    private int colorValue(int selectedColor) {
+        return ContextCompat.getColor(getContext(), selectedColor);
+    }
+
+
+    private void unselectAllTabs() {
         for (int childIndex = 0; childIndex < getChildCount(); childIndex++) {
-            resetIndicatorColor(getChildAt(childIndex));
+            Tab tab = tabs.get(childIndex);
+            if (tab.view.isSelected()) {
+                updateToUnselectedState(tab);
+            }
         }
     }
 
-    private void selectCurrentTab(View v, TabBarBuilder builder) {
-        v.findViewById(R.id.tab_indicator)
-                .setBackgroundResource(builder.indicatorsColor);
+    private void selectTab(Tab tab) {
+        switchTab(tab, tab.data.selectedColor, tab.data.selectedColor, true);
     }
 
     @SuppressWarnings("unchecked")
-    private void invokeOnTabClick(View v, TabBarBuilder builder, int viewIndex) {
-        Object item = v.getTag();
-        OnTabClick onTabClick = (OnTabClick) builder.onTabClicks.get(viewIndex);
-        onTabClick.onClick(viewIndex, item);
+    private void invokeOnTabClick(int viewIndex, Tab tab) {
+        tab.data.onClick.onClick(viewIndex, tab.data.item);
     }
 
 

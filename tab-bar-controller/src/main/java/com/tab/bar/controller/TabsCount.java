@@ -6,6 +6,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.SOURCE)
-@IntDef({1,2,3,4})
+@IntDef({2,3,4})
 public @interface TabsCount {
+
+    int MIN_COUNT = 2;
+    int MAX_COUNT = 4;
+
 }

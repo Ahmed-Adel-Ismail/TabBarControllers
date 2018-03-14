@@ -9,5 +9,6 @@ import java.lang.annotation.RetentionPolicy;
 @IntDef({0, 1, 2, 3})
 public @interface TabIndex {
 
+    int MIN_INDEX = 0;
     int MAX_INDEX = 3;
 }

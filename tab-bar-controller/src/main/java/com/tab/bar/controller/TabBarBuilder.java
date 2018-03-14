@@ -2,6 +2,7 @@ package com.tab.bar.controller;
 
 import android.support.annotation.ColorRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 
 import java.util.LinkedHashMap;
 
@@ -9,17 +10,15 @@ public class TabBarBuilder<T> {
 
     @TabsCount
     final int tabsCount;
-    @ColorRes
-    int indicatorsColor = android.R.color.holo_red_dark;
-    @ColorRes
-    int labelsColor = android.R.color.holo_red_dark;
     @LayoutRes
     int tabView = R.layout.view_tab;
 
-    LinkedHashMap<Integer, T> items = new LinkedHashMap<>(5, 1f);
-    LinkedHashMap<Integer, Integer> icons = new LinkedHashMap<>(5, 1f);
-    LinkedHashMap<Integer, Integer> labels = new LinkedHashMap<>(5, 1f);
-    LinkedHashMap<Integer, OnTabClick<T>> onTabClicks = new LinkedHashMap<>(5, 1f);
+    LinkedHashMap<Integer, TabData<T>> tabsData = new LinkedHashMap<>(5, 1f);
+
+    @ColorRes
+    private int selectedColor = android.R.color.holo_red_dark;
+    @ColorRes
+    private int unselectedColor = android.R.color.holo_red_dark;
 
     private TabBarBuilder(@TabsCount int tabsCount) {
         this.tabsCount = tabsCount;
@@ -29,38 +28,44 @@ public class TabBarBuilder<T> {
         return new TabBarFactor<>();
     }
 
-    public TabBarBuilder<T> withIndicatorsColor(@ColorRes int indicatorsColor) {
-        this.indicatorsColor = indicatorsColor;
+    public TabBarBuilder<T> withSelectedColor(@ColorRes int selectedColorResource) {
+        this.selectedColor = selectedColorResource;
         return this;
     }
 
-    public TabBarBuilder<T> withLabelsColor(@ColorRes int labelsColor) {
-        this.labelsColor = labelsColor;
+    public TabBarBuilder<T> withUnSelectedColor(@ColorRes int unselectedColorResource) {
+        this.unselectedColor = unselectedColorResource;
         return this;
     }
 
     public TabBuilder<T> withNextTab() {
-        return withTab(nextTabIndexOrCrash());
+        return withTab(tabsData.keySet().size());
     }
 
     public TabBuilder<T> withTab(@TabIndex int index) {
+        if (index < TabIndex.MIN_INDEX || index > TabIndex.MAX_INDEX) {
+            throw new UnsupportedOperationException("invalid view index, minimum is "
+                    + TabIndex.MIN_INDEX + " and maximum is " + TabIndex.MAX_INDEX);
+        }
         return new TabBuilder<>(this, index);
     }
 
-    private int nextTabIndexOrCrash() {
-        int nextIndex = items.keySet().size();
-        if (nextIndex > TabIndex.MAX_INDEX) {
-            throw new UnsupportedOperationException("max tabs reached");
-        }
-        return nextIndex;
-    }
 
     TabBarBuilder<T> buildTab(TabBuilder<T> tabBuilder) {
-        items.put(tabBuilder.index, tabBuilder.item);
-        icons.put(tabBuilder.index, tabBuilder.icon);
-        labels.put(tabBuilder.index, tabBuilder.label);
-        onTabClicks.put(tabBuilder.index, tabBuilder.onClick);
+        tabsData.put(tabBuilder.index, tabData(tabBuilder));
         return this;
+    }
+
+    @NonNull
+    private TabData<T> tabData(TabBuilder<T> tabBuilder) {
+        return new TabData.Builder<T>()
+                .selectedColor(selectedColor)
+                .unselectedColor(unselectedColor)
+                .item(tabBuilder.item)
+                .iconResource(tabBuilder.icon)
+                .labelResource(tabBuilder.label)
+                .onClick(tabBuilder.onClick)
+                .build();
     }
 
     public void draw(TabBarController tabBarController) {
@@ -74,6 +79,10 @@ public class TabBarBuilder<T> {
         }
 
         public TabBarBuilder<T> withTabsCount(@TabsCount int tabsCount) {
+            if (tabsCount < TabsCount.MIN_COUNT || tabsCount > TabsCount.MAX_COUNT) {
+                throw new UnsupportedOperationException("invalid tabs count, minimum is "
+                        + TabsCount.MIN_COUNT + " and maximum is " + TabsCount.MAX_COUNT);
+            }
             return new TabBarBuilder<>(tabsCount);
         }
 

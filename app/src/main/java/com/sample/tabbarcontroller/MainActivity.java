@@ -15,9 +15,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         TabBarBuilder.withDataSourceType(Data.class)
                 .withTabsCount(4)
-                .withIndicatorsColor(android.R.color.holo_blue_dark)
-                .withLabelsColor(android.R.color.holo_blue_dark)
-                .withTab(0)
+                .withSelectedColor(android.R.color.holo_red_dark)
+                .withUnSelectedColor(android.R.color.holo_blue_dark)
+                .withNextTab()
                 .withItem(new Data("tab-1"))
                 .withIcon(R.drawable.ic_dashboard_menu)
                 .withLabel(R.string.data_one)
